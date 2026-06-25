@@ -1,15 +1,13 @@
 package com.omar.razerpay.common.entity;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Embeddable
-// 1. Hide the all-args constructor from developers to enforce use of factory methods
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-// 2. Hide the no-args constructor, but leave it protected for JPA/Hibernate
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class Money {
     private int amountUnits;
     private String currency;

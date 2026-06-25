@@ -1,8 +1,10 @@
 package com.omar.razerpay.payment.entity;
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import com.omar.razerpay.common.entity.Money;
 import com.omar.razerpay.common.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -11,8 +13,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "order_record")
-public class OrderRecord {
+@Table(name = "order_record", indexes = {
+        @Index(name = "idx_order_record_id_merchant_id", columnList = "id, merchant_id"),
+        @Index(name = "idx_order_record_merchant_id", columnList = "merchant_id")
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class OrderRecord extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -23,17 +33,22 @@ public class OrderRecord {
     @Embedded
     private Money amount;
 
+    @Column(length = 100)
+    private String receipt;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private OrderStatus status = OrderStatus.CREATED;
 
     @Column(nullable = false)
-    private Integer attempts;
+    @Builder.Default
+    private Integer attempts = 0;
 
     @JdbcTypeCode((SqlTypes.JSON))
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> notes;
 
-    @Column(name = "expires_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime expiresAt;
 }

@@ -1,14 +1,23 @@
 package com.omar.razerpay.merchant.entity;
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import com.omar.razerpay.common.enums.Environment;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "api_key")
-public class ApiKey {
+@Table(name = "api_key", indexes = {
+        @Index(name = "idx_apikey_merchant_env", columnList = "merchant_id, environment, enabled")
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class ApiKey extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -23,12 +32,16 @@ public class ApiKey {
     @Column(nullable = false, length = 255)
     private String keySecretHash;
 
+    @Column(length = 255)
+    private String previousKeySecretHash;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private Environment environment;
 
     @Column(nullable = false)
-    private boolean enabled;
+    @Builder.Default
+    private boolean enabled = true;
 
     private LocalDateTime lastUsedAt;
     private LocalDateTime rotatedAt;

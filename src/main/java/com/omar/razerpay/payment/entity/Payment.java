@@ -1,9 +1,11 @@
 package com.omar.razerpay.payment.entity;
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import com.omar.razerpay.common.entity.Money;
 import com.omar.razerpay.common.enums.PaymentMethod;
 import com.omar.razerpay.common.enums.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -12,17 +14,25 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payment")
-public class Payment {
+@Table(name = "payment", indexes = {
+        @Index(name = "idx_payment_order_id", columnList = "order_id"),
+        @Index(name = "idx_payment_merchant_id", columnList = "merchant_id")
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class Payment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "order_record_id", nullable = false)
-    private OrderRecord orderRecord;
+    @JoinColumn(nullable = false, name = "order_id")
+    private OrderRecord order;
 
-    @Column(name = "merchant_id", nullable = false)
+    @Column(nullable = false)
     private UUID merchantId;
 
     @Embedded
@@ -40,30 +50,23 @@ public class Payment {
     private PaymentMethod method;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb", name = "method_details")
+    @Column(columnDefinition = "jsonb")
     private Map<String, Object> methodDetails;
 
-    @Column(name = "bank_reference", length = 100)
+    @Column(length = 100)
     private String bankReference;
 
-    @Column(name = "error_code", length = 100)
+    @Column(length = 100)
     private String errorCode;
 
-    @Column(name = "error_description", length = 200)
+    @Column(length = 200)
     private String errorDescription;
 
-    @Column(name = "authorized_at")
     private LocalDateTime authorizedAt;
 
-    @Column(name = "captured_at")
-    private LocalDateTime capturedAt;
-
-    @Column(name = "failed_at")
     private LocalDateTime failedAt;
 
-    @Column(name = "refunded_at")
     private LocalDateTime refundedAt;
 
-    @Column(name = "settled_at")
     private LocalDateTime settledAt;
 }

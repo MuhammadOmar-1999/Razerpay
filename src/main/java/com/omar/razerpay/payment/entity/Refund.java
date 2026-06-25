@@ -1,8 +1,13 @@
 package com.omar.razerpay.payment.entity;
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import com.omar.razerpay.common.entity.Money;
 import com.omar.razerpay.common.enums.RefundStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -12,8 +17,12 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Refund")
-public class Refund {
+@Table(name = "refund")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Refund extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -21,7 +30,7 @@ public class Refund {
     @ManyToOne(fetch = FetchType.LAZY)
     private Payment payment;
 
-    @Column(name = "merchant_id", nullable = false)
+    @Column(nullable = false)
     private UUID merchantId;
 
     @Embedded
@@ -31,19 +40,18 @@ public class Refund {
     @Column(nullable = false)
     private RefundStatus status = RefundStatus.PENDING;
 
-    @Column(name = "bank_reference", length = 100)
+    @Column(length = 100)
     private String bankReference;
 
-    @Column(length = 100, name = "error_code")
+    @Column(length = 100)
     private String errorCode;
 
-    @Column(length = 500, name = "error_description")
+    @Column(length = 500)
     private String errorDescription;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> notes;
 
-    @Column(name = "processed_at")
     private LocalDateTime processedAt;
 }

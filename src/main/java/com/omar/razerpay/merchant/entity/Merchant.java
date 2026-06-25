@@ -1,6 +1,7 @@
 package com.omar.razerpay.merchant.entity;
 
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import com.omar.razerpay.common.enums.BusinessType;
 import com.omar.razerpay.common.enums.MerchantStatus;
 import jakarta.persistence.*;
@@ -10,13 +11,15 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "merchant")
+@Table(name = "merchant", indexes= {
+        @Index(name = "idx_merchant_status", columnList = "status")
+})
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Merchant {
+public class Merchant extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -33,6 +36,9 @@ public class Merchant {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private MerchantStatus status =  MerchantStatus.PENDING_KYC;
+
+    @Column(nullable = false, length = 200)
+    private String businessName;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
