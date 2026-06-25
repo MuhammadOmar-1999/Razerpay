@@ -1,12 +1,15 @@
 package com.omar.razerpay.merchant.entity;
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import jakarta.persistence.*;
 
 import java.util.UUID;
 
 @Entity
-@Table(name = "merchant_webhook_config")
-public class MerchantWebhookConfig {
+@Table(name = "merchant_webhook_config", indexes = {
+        @Index(name = "idx_merchant_webhook_config_merchant_id", columnList = "merchant_id, enabled")
+})
+public class MerchantWebhookConfig extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

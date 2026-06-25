@@ -1,13 +1,26 @@
 package com.omar.razerpay.payment.entity;
 
+import com.omar.razerpay.common.entity.BaseEntity;
 import com.omar.razerpay.common.enums.PaymentActor;
 import com.omar.razerpay.common.enums.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class PaymentTransitionLog {
+@Entity
+@Table(name = "payment_transition_log", indexes = {
+        @Index(name = "idx_payment_transition_log_payment_id", columnList = "payment_id"),
+})
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+public class PaymentTransitionLog extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -17,17 +30,17 @@ public class PaymentTransitionLog {
     private Payment payment;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "from_status", length = 20)
+    @Column(length = 20)
     private PaymentStatus fromStatus;
 
-    @Column(name = "to_status", length = 20)
+    @Column(length = 20)
     private PaymentStatus toStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private PaymentActor actor;
 
-    @Column(name = "occurred_at", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime occurredAt;
 
 }
