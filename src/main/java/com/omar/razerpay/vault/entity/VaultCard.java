@@ -2,12 +2,18 @@ package com.omar.razerpay.vault.entity;
 
 import com.omar.razerpay.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "vault_card")
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class VaultCard extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,10 +35,10 @@ public class VaultCard extends BaseEntity {
     private String brand;
 
     @Column(name = "expiry_month", nullable = false)
-    private String expiryMonth;
+    private Integer expiryMonth;
 
     @Column(name = "expiry_year", nullable = false)
-    private String expiryYear;
+    private Integer expiryYear;
 
     @Column(name = "card_holder_name", nullable = false)
     private String cardHolderName;

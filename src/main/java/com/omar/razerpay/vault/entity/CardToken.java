@@ -2,12 +2,18 @@ package com.omar.razerpay.vault.entity;
 
 import com.omar.razerpay.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "card_token")
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CardToken extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,7 +24,7 @@ public class CardToken extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "vault_card_id", nullable = false)
-    private VaultCard card;
+    private VaultCard vaultCard;
 
     @Column(name = "customer_id", nullable = false)
     private UUID customerId;
