@@ -68,7 +68,7 @@ public class BankCallBackSimulator {
 
     private LocalDateTime dueAt(Payment payment, SimulatorConfig.MethodSimulatorConfig methodConfig) {
         int range = methodConfig.getMaxDelaySeconds() - methodConfig.getMinDelaySeconds();
-        int delaySeconds = methodConfig.getMinDelaySeconds() + Math.abs(payment.hashCode()) % (range + 1);
+        int delaySeconds = methodConfig.getMinDelaySeconds() + Math.abs(payment.getId().hashCode()) % (range + 1);
 
         if (simulatorConfig.getChaosMode() == ChaosMode.SLOW) {
             delaySeconds *= 2;
@@ -78,7 +78,7 @@ public class BankCallBackSimulator {
     }
 
     private boolean shouldApprove(Payment payment, SimulatorConfig.MethodSimulatorConfig methodConfig) {
-        int bucket = Math.abs(payment.hashCode()) % 100;
+        int bucket = Math.abs(payment.getId().hashCode()) % 100;
         return bucket < methodConfig.getSuccessRate();
     }
 }

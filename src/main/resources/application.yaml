@@ -15,13 +15,13 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 vault:
-  master-key: ${VAULT_MASTER_KEY:opiqa9ls09q28392f7891q243klnqaw09oq2390sdf}
+  master-key: ${VAULT_MASTER_KEY:v8/bQ+8QfNlU/wZ9vQz3R/jK3x+8wQz3R/jK3x+8wQz=}
 
 
 payment:
   simulator:
     poll-interval-ms: 5000
-    chaos-mode: NORMAL
+    chaos-mode: SLOW
     methods:
       CARD:
         min-delay-seconds: 2
@@ -35,3 +35,6 @@ payment:
         min-delay-seconds: 4
         max-delay-seconds: 10
         success-rate: 80
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:ads9f6askj3h4k1hf86asdfiahkjh34a789s6df89ayshkjh3jkh786adsf78ay}

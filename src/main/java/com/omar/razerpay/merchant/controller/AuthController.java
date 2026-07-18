@@ -1,6 +1,8 @@
 package com.omar.razerpay.merchant.controller;
 
+import com.omar.razerpay.merchant.dto.request.LoginRequest;
 import com.omar.razerpay.merchant.dto.request.MerchantSignupRequest;
+import com.omar.razerpay.merchant.dto.response.LoginResponse;
 import com.omar.razerpay.merchant.dto.response.MerchantResponse;
 import com.omar.razerpay.merchant.service.AuthService;
 import jakarta.validation.Valid;
@@ -22,6 +24,11 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<MerchantResponse> signup(@Valid @RequestBody MerchantSignupRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.signup(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
+        return ResponseEntity.status(HttpStatus.OK).body(authService.login(request));
     }
 
 }
