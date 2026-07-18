@@ -15,6 +15,7 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     private final MerchantRepository merchantRepository;
     private final ApiKeyRepository apiKeyRepository;
     private final ApiKeyMapper apiKeyMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -41,7 +43,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
          ApiKey apiKey = ApiKey.builder()
                  .merchant(merchant)
                  .keyId(keyId)
-                 .keySecretHash(rawSecret) //TODO: encode with BcryptPasswordEncoder
+                 .keySecretHash(passwordEncoder.encode(rawSecret))
                  .environment(request.environment())
                  .build();
 
@@ -80,7 +82,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
         String newRawSecret = RandomizerUtil.randomBase64(40);
         apiKey.setPreviousKeySecretHash(apiKey.getKeySecretHash());
-        apiKey.setKeySecretHash(newRawSecret);
+        apiKey.setKeySecretHash(passwordEncoder.encode(newRawSecret));
         apiKey.setRotatedAt(LocalDateTime.now());
         apiKey.setGracePeriodExpiresAt(LocalDateTime.now().plusHours(24));
         apiKey = apiKeyRepository.save(apiKey);

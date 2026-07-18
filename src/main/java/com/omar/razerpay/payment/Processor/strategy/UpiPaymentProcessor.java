@@ -4,7 +4,9 @@ import com.omar.razerpay.common.util.RandomizerUtil;
 import com.omar.razerpay.payment.Processor.PaymentProcessor;
 import com.omar.razerpay.payment.Processor.dto.PaymentProcessorRequest;
 import com.omar.razerpay.payment.Processor.dto.PaymentProcessorResponse;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UpiPaymentProcessor implements PaymentProcessor {
     @Override
     public PaymentProcessorResponse charge(PaymentProcessorRequest request) {

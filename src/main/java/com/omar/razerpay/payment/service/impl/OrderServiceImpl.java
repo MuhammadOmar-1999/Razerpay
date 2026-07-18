@@ -8,7 +8,6 @@ import com.omar.razerpay.payment.dto.reponse.OrderResponse;
 import com.omar.razerpay.payment.dto.reponse.PaymentResponse;
 import com.omar.razerpay.payment.dto.request.CreateOrderRequest;
 import com.omar.razerpay.payment.entity.OrderRecord;
-import com.omar.razerpay.payment.entity.Payment;
 import com.omar.razerpay.payment.mapper.OrderMapper;
 import com.omar.razerpay.payment.mapper.PaymentMapper;
 import com.omar.razerpay.payment.repository.OrderRepository;
@@ -17,7 +16,6 @@ import com.omar.razerpay.payment.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

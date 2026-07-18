@@ -4,15 +4,16 @@ import com.omar.razerpay.common.util.RandomizerUtil;
 import com.omar.razerpay.payment.Processor.PaymentProcessor;
 import com.omar.razerpay.payment.Processor.dto.PaymentProcessorRequest;
 import com.omar.razerpay.payment.Processor.dto.PaymentProcessorResponse;
-import org.aspectj.weaver.ast.Call;
+import org.springframework.stereotype.Component;
 
+@Component
 public class NetBankingPaymentProcessor implements PaymentProcessor {
     @Override
     public PaymentProcessorResponse charge(PaymentProcessorRequest request) {
 
         final String BANK_CODE_FAIL = "BANK_CODE_FAIL";
 
-        String bankCode = request.methodDetails() != null ? request.methodDetails().get("BANK").toString() : null;
+        String bankCode = request.methodDetails() != null ? request.methodDetails().get("bank").toString() : null;
 
         if(BANK_CODE_FAIL.equals(bankCode)){
             return new PaymentProcessorResponse.Failed("BANK_REJECTED", "Bank rejected the transaction registration");

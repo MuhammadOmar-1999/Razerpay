@@ -1,5 +1,6 @@
 package com.omar.razerpay.payment.controller;
 
+import com.omar.razerpay.merchant.security.MerchantContext;
 import com.omar.razerpay.payment.dto.reponse.PaymentResponse;
 import com.omar.razerpay.payment.dto.request.PaymentInitRequest;
 import com.omar.razerpay.payment.service.PaymentService;
@@ -7,31 +8,29 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@RestController("/v1/payments")
+@RestController
+@RequestMapping("/v1/payments")
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
-    UUID merchantId = UUID.fromString("d1e2a800-6e70-47df-9b09-d16ac53ada33"); //TODO: replace it with MerchantContext
+    private final MerchantContext merchantContext;
 
     @PostMapping
     public ResponseEntity<PaymentResponse> initiate(@Valid @RequestBody PaymentInitRequest request){
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(paymentService.initiate(merchantId, request));
+                .body(paymentService.initiate(merchantContext.getMerchantId(), request));
     }
 
     @PostMapping("/{paymentId}/capture")
     public ResponseEntity<PaymentResponse> capture(@PathVariable("paymentId") UUID paymentId){
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(paymentService.capture(merchantId, paymentId));
+                .body(paymentService.capture(merchantContext.getMerchantId(), paymentId));
     }
 }
 

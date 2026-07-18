@@ -43,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException("OrderRecord", request.orderId().toString()));
 
         if (!(order.getStatus() == OrderStatus.CREATED || order.getStatus() == OrderStatus.ATTEMPTED)) {
-            throw new BusinessRuleViolationException("Cannot initiate payment as order in " + order.getStatus() + "status", "ORDER_NOT_PAYABLE");
+            throw new BusinessRuleViolationException("Cannot initiate payment as order in " + order.getStatus() + " status", "ORDER_NOT_PAYABLE");
         }
 
         order.setStatus(OrderStatus.ATTEMPTED);
@@ -57,6 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .status(PaymentStatus.CREATED)
                 .method(request.paymentMethod())
                 .methodDetails(request.methodDetails())
+                .idempotencyKey(UUID.randomUUID().toString())
                 .build();
 
         payment = paymentRepository.save(payment);
@@ -81,7 +82,8 @@ public class PaymentServiceImpl implements PaymentService {
                 payment.setErrorDescription(errorDescription);
             }
 
-            case PaymentResult.Success success -> {}
+            case PaymentResult.Success success -> {
+            }
         }
 
         payment = paymentRepository.save(payment);
@@ -89,17 +91,18 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentMapper.toPaymentResponse(payment);
     }
 
+    //the below capture method is used in the explicit capture endpoint of PaymentController
     @Override
     @Transactional
     public PaymentResponse capture(UUID merchantId, UUID paymentId) {
         Payment payment = paymentRepository.findByIdAndMerchantId(paymentId, merchantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", paymentId.toString()));
 
-        if(payment.getStatus() == PaymentStatus.CAPTURED) {
+        if (payment.getStatus() == PaymentStatus.CAPTURED) {
             throw new BusinessRuleViolationException("Payment already captured, paymentId: " + paymentId, "PAYMENT_ALREADY_CAPTURED");
         }
 
-        if(payment.getStatus() != PaymentStatus.AUTHORIZED) {
+        if (payment.getStatus() != PaymentStatus.AUTHORIZED) {
             throw new BusinessRuleViolationException("Payment can not be captured, paymentId: " + paymentId, "PAYMENT_NOT_AUTHORIZED");
         }
 
@@ -130,7 +133,45 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void resolveAuthorization(UUID paymentId, boolean approved, String bankRef, String errorCode, String errorDescription) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(
+                () -> new ResourceNotFoundException("Payment", paymentId.toString())
+        );
 
+        if (payment.getStatus() != PaymentStatus.AUTHORIZING) {
+            log.warn("Payment is not in AUTHORIZING state, paymentId: {}, currentStatus: {}", paymentId, payment.getStatus());
+            return;
+        }
+
+        OrderRecord orderRecord = payment.getOrder();
+        if (approved) {
+            paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_SUCCESS);
+            payment.setBankReference(bankRef);
+            payment.setAuthorizedAt(LocalDateTime.now());
+
+            //Auto-capture
+            paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_REQUEST);
+            PaymentResult captureResult = paymentGatewayRouter.capture(payment.getMethod(), paymentId);
+
+            if (captureResult instanceof PaymentResult.Success) {
+                paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_SUCCESS);
+                payment.setCapturedAt(LocalDateTime.now());
+                orderRecord.setStatus(OrderStatus.PAID);
+                log.info("Payment captured successfully. Payment id: {}", payment.getId());
+            } else {
+                paymentTransitionService.apply(payment, PaymentEvent.CAPTURE_FAILURE);
+                payment.setErrorCode(errorCode);
+                payment.setErrorDescription(errorDescription);
+            }
+        }
+        else{
+            paymentTransitionService.apply(payment, PaymentEvent.AUTHORIZE_FAILURE);
+            payment.setErrorCode(errorCode);
+            payment.setErrorDescription(errorDescription);
+        }
+
+        paymentRepository.save(payment);
+        orderRepository.save(orderRecord);
     }
 }

@@ -3,7 +3,6 @@ package com.omar.razerpay.vault.service.impl;
 import com.omar.razerpay.common.entity.Money;
 import com.omar.razerpay.common.enums.CardBrand;
 import com.omar.razerpay.common.util.RandomizerUtil;
-import com.omar.razerpay.payment.Processor.PaymentProcessor;
 import com.omar.razerpay.payment.Processor.PaymentProcessorRouter;
 import com.omar.razerpay.payment.Processor.dto.PaymentProcessorRequest;
 import com.omar.razerpay.payment.Processor.dto.PaymentProcessorResponse;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

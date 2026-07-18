@@ -6,6 +6,7 @@ import com.omar.razerpay.common.enums.BusinessType;
 import com.omar.razerpay.common.enums.MerchantStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Merchant extends BaseEntity {
+public class Merchant extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
