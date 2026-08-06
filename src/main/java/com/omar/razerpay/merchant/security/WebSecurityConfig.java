@@ -1,6 +1,7 @@
 package com.omar.razerpay.merchant.security;
 
 import com.omar.razerpay.merchant.security.filters.ApiKeyAuthenticationFilter;
+import com.omar.razerpay.merchant.security.filters.IdempotencyFilter;
 import com.omar.razerpay.merchant.security.filters.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +27,7 @@ public class WebSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
-
+    private final IdempotencyFilter idempotencyFilter;
 
     @Bean
     public SecurityFilterChain jwtChain(HttpSecurity http) {
@@ -43,9 +44,8 @@ public class WebSecurityConfig {
                 .formLogin(form ->
                         form.disable())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(idempotencyFilter, JwtAuthenticationFilter.class)
                 .build();
-
-
     }
 
     @Bean
@@ -61,6 +61,7 @@ public class WebSecurityConfig {
                 .formLogin(form ->
                         form.disable())
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(idempotencyFilter, ApiKeyAuthenticationFilter.class)
                 .build();
     }
 }

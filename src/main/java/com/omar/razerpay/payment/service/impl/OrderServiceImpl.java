@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse create(UUID merchantId, CreateOrderRequest request) {
+    public OrderResponse create(UUID merchantId, CreateOrderRequest request)  {
         if(request.receipt()!=null && orderRepository.existsByMerchantIdAndReceipt(merchantId, request.receipt()))
             throw new DuplicateResourceException("ORDER_RECEIPT_DUPLICATE", "Receipt", request.receipt());
 
@@ -53,7 +53,6 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderRecord = orderRepository.save(orderRecord);
-
 
         //TODO: publish send kafka event about order creation
         return orderMapper.toOrderResponse(orderRecord);
