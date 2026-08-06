@@ -2,6 +2,7 @@ package com.omar.razerpay.merchant.service.impl;
 
 import com.omar.razerpay.common.exception.ResourceNotFoundException;
 import com.omar.razerpay.common.util.RandomizerUtil;
+import com.omar.razerpay.merchant.cache.ApiKeyCache;
 import com.omar.razerpay.merchant.dto.request.CreateApiKeyRequest;
 import com.omar.razerpay.merchant.dto.response.ApiKeyCreateResponse;
 import com.omar.razerpay.merchant.dto.response.ApiKeyResponse;
@@ -29,6 +30,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     private final ApiKeyRepository apiKeyRepository;
     private final ApiKeyMapper apiKeyMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ApiKeyCache apiKeyCache;
 
     @Override
     @Transactional
@@ -67,6 +69,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
                 .orElseThrow(()-> new ResourceNotFoundException("ApiKeyId", id.toString()));
 
         key.setEnabled(false);
+        apiKeyCache.evict(key.getKeyId());
     }
 
     @Override
@@ -86,6 +89,8 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         apiKey.setRotatedAt(LocalDateTime.now());
         apiKey.setGracePeriodExpiresAt(LocalDateTime.now().plusHours(24));
         apiKey = apiKeyRepository.save(apiKey);
+
+        apiKeyCache.evict(apiKey.getKeyId());
 
         return new ApiKeyCreateResponse(
                 apiKey.getId(),
