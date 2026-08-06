@@ -14,6 +14,12 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
 vault:
   master-key: ${VAULT_MASTER_KEY:v8/bQ+8QfNlU/wZ9vQz3R/jK3x+8wQz3R/jK3x+8wQz=}
 
@@ -38,3 +44,11 @@ payment:
 
 jwt:
   secret-key: ${JWT_SECRET_KEY:ads9f6askj3h4k1hf86asdfiahkjh34a789s6df89ayshkjh3jkh786adsf78ay}
+
+
+app:
+  rate-limit:
+    method: token-bucket
+    use-case:
+      api-key:
+        requests-limit: 10
