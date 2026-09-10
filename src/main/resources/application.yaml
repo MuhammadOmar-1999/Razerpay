@@ -1,8 +1,8 @@
 spring:
   application:
-    name: razerpay
+    name: razorpay
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/razerpay}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/razorpay-db}
     username: ${DB_USER:postgres}
     password: ${DB_PASS:srkzomar}
 
@@ -20,9 +20,32 @@ spring:
       port: ${REDIS_PORT:6379}
       password: ${REDIS_PASSWORD:}
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      acks: all
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        retries: 3
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: razorpay-monolith
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.omar.razorpay.*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: java.util.LinkedHashMap
+
 vault:
   master-key: ${VAULT_MASTER_KEY:v8/bQ+8QfNlU/wZ9vQz3R/jK3x+8wQz3R/jK3x+8wQz=}
-
+  fingerprint:
+    secret: ${VAULT_FINGERPRINT_SECRET:OThqM2Zrczl2MGI0aGZqODl2YjM0aGZqOTh2YjM0aGY=}
 
 payment:
   simulator:
@@ -45,10 +68,16 @@ payment:
 jwt:
   secret-key: ${JWT_SECRET_KEY:ads9f6askj3h4k1hf86asdfiahkjh34a789s6df89ayshkjh3jkh786adsf78ay}
 
-
 app:
   rate-limit:
     method: token-bucket
     use-case:
       api-key:
         requests-limit: 10
+
+  kafka:
+    topics:
+      payment: payments.events
+      order: orders.events
+      refund: refunds.events
+      settlement: settlements.events
