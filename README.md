@@ -1,2 +1,2 @@
-# Razerpay
+# Razorpay
 Razerpay backend clone
